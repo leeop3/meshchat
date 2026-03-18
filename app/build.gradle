@@ -7,18 +7,13 @@ plugins {
 android {
     namespace 'com.meshapp.meshchat'
     compileSdk 34
-
     defaultConfig {
         applicationId "com.meshapp.meshchat"
         minSdk 24
         targetSdk 34
-        versionCode 2
-        versionName "0.2"
-
-        ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a"
-        }
-
+        versionCode 3
+        versionName "0.3"
+        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }
         python {
             buildPython "python3"
             pip {
@@ -28,7 +23,6 @@ android {
             }
         }
     }
-
     buildFeatures { compose true }
     composeOptions { kotlinCompilerExtensionVersion "1.5.8" }
     compileOptions {
@@ -42,7 +36,7 @@ dependencies {
     implementation "androidx.core:core-ktx:1.12.0"
     implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "com.google.android.material:material:1.11.0"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
     implementation "androidx.activity:activity-compose:1.8.2"
     implementation platform("androidx.compose:compose-bom:2023.10.01")
     implementation "androidx.compose.ui:ui"
