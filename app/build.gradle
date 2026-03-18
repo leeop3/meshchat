@@ -12,8 +12,8 @@ android {
         applicationId "com.meshapp.meshchat"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "0.1"
+        versionCode 2
+        versionName "0.2"
 
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
@@ -22,35 +22,25 @@ android {
         python {
             buildPython "python3"
             pip {
-                install "rns==0.7.4"
-                install "lxmf==0.4.4"
+                install "rns==1.1.4"
+                install "lxmf==0.9.3"
                 install "pyserial"
             }
         }
     }
 
-    buildFeatures {
-        compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.5.8"
-    }
-
+    buildFeatures { compose true }
+    composeOptions { kotlinCompilerExtensionVersion "1.5.8" }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    kotlinOptions { jvmTarget = "17" }
 }
 
 dependencies {
     implementation "androidx.core:core-ktx:1.12.0"
     implementation "androidx.appcompat:appcompat:1.6.1"
-    // ADDED THIS: Required for Material3 XML themes
     implementation "com.google.android.material:material:1.11.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
     implementation "androidx.activity:activity-compose:1.8.2"

@@ -7,30 +7,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // 1. Start Python
         if (!Python.isStarted()) {
             Python.start(AndroidPlatform(this))
         }
         
         val py = Python.getInstance()
+        val configPath = File(filesDir, ".reticulum").absolutePath
         
-        // 2. Call our python script 'main.py' and its function 'get_info'
-        val meshInfo = try {
-            val module = py.getModule("main")
-            module.callAttr("get_info").toString()
+        val status = try {
+            val module = py.getModule("rns_manager")
+            module.callAttr("start_mesh", configPath).toString()
         } catch (e: Exception) {
-            "Error loading Mesh Engine: ${e.message}"
+            "RNS Error: ${e.message}"
         }
 
         setContent {
             Column {
-                Text("Native Android UI Loaded")
-                Text(meshInfo)
+                Text("MeshChat v0.2")
+                Text(status)
+                Text("Waiting for Bluetooth Bridge...")
             }
         }
     }
