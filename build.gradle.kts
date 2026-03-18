@@ -1,18 +1,6 @@
-﻿buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.2.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
-        classpath("com.chaquo.python:gradle:15.0.1")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+﻿plugins {
+    id("com.android.application") version "8.2.2" apply false
+    id("com.android.library") version "8.2.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+    id("com.chaquo.python") version "15.0.1" apply false
 }
