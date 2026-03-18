@@ -19,7 +19,8 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
 
-        python {
+        // Using explicit configuration to avoid "Unresolved reference"
+        configure<com.chaquo.python.Sdk> {
             buildPython("python3")
             pip {
                 install("rns==0.6.7")
@@ -41,7 +42,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    
+
     kotlinOptions {
         jvmTarget = "17"
     }
