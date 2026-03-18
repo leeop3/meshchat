@@ -1,4 +1,5 @@
-﻿plugins {
+@'
+plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.chaquo.python")
@@ -15,19 +16,19 @@ android {
         versionCode = 1
         versionName = "0.1"
 
-        // Corrected NDK syntax for Kotlin DSL
+        // Correct NDK syntax for Kotlin DSL
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
-    }
 
-    // Move python block OUTSIDE of defaultConfig
-    python {
-        buildPython("python3")
-        pip {
-            install("rns==0.6.7")
-            install("lxmf==0.4.4")
-            install("pyserial")
+        // MOVED BACK INSIDE defaultConfig - This is where Chaquopy looks
+        python {
+            buildPython("python3")
+            pip {
+                install("rns==0.6.7")
+                install("lxmf==0.4.4")
+                install("pyserial")
+            }
         }
     }
 
@@ -60,3 +61,4 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
 }
+'@ | Set-Content -Path "app/build.gradle.kts" -Encoding utf8
