@@ -1,6 +1,4 @@
-﻿import com.chaquo.python.Sdk
-
-plugins {
+﻿plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.chaquo.python")
@@ -20,15 +18,14 @@ android {
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
-    }
 
-    // Modern Chaquopy syntax for Kotlin DSL
-    python {
-        buildPython("python3")
-        pip {
-            install("rns==0.6.7")
-            install("lxmf==0.4.4")
-            install("pyserial")
+        python {
+            buildPython("python3")
+            pip {
+                install("rns==0.6.7")
+                install("lxmf==0.4.4")
+                install("pyserial")
+            }
         }
     }
 
@@ -43,6 +40,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
