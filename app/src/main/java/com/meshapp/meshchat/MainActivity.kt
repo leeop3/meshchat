@@ -1,6 +1,7 @@
 package com.meshapp.meshchat
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
@@ -71,28 +72,23 @@ class MainActivity : ComponentActivity() {
 
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("MeshChat v0.4", style = MaterialTheme.typography.headlineMedium)
-                Text("RNS: $rnsStatus")
+                Text("RNS Status: $rnsStatus")
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text("Select RNode (Paired Devices):", style = MaterialTheme.typography.titleMedium)
                 
                 if (pairedDevices.isEmpty()) {
-                    Text("No paired devices found. Please pair your RNode in Android Settings first.")
+                    Text("No paired devices found or permission missing.", style = MaterialTheme.typography.bodySmall)
                 }
 
-                LazyColumn {
+                LazyColumn(modifier = Modifier.weight(1f)) {
                     items(pairedDevices) { device ->
-                        ListItem(
-                            headlineContent = { Text(device.name ?: "Unknown Device") },
-                            supportingContent = { Text(device.address) },
-                            modifier = Modifier.clickable {
-                                val intent = Intent(context, MeshService::class.java)
-                                intent.putExtra("device_address", device.address)
-                                context.startForegroundService(intent)
-                            }
-                        )
-                        HorizontalDivider()
+                        BluetoothDeviceItem(device) {
+                            val intent = Intent(context, MeshService::class.java)
+                            intent.putExtra("device_address", device.address)
+                            context.startForegroundService(intent)
+                        }
                     }
                 }
                 
@@ -106,8 +102,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    @Composable
+    fun BluetoothDeviceItem(device: BluetoothDevice, onClick: () -> Unit) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 8.dp)
+        ) {
+            Text(text = device.name ?: "Unknown Device", style = MaterialTheme.typography.bodyLarge)
+            Text(text = device.address, style = MaterialTheme.typography.bodySmall)
+            Divider(modifier = Modifier.padding(top = 8.dp))
+        }
+    }
+
     private fun getPairedDevices(): List<BluetoothDevice> {
-        val adapter = BluetoothAdapter.getDefaultAdapter()
-        return adapter?.bondedDevices?.toList() ?: emptyList()
+        return try {
+            val adapter = BluetoothAdapter.getDefaultAdapter()
+            adapter?.bondedDevices?.toList() ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
