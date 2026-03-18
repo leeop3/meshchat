@@ -3,32 +3,59 @@
     id("org.jetbrains.kotlin.android")
     id("com.chaquo.python")
 }
+
 android {
     namespace = "com.meshapp.meshchat"
     compileSdk = 34
+
     defaultConfig {
         applicationId = "com.meshapp.meshchat"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "0.1"
-        python {
-            buildPython("python3")
-            pip {
-                install("rns==0.6.7")
-                install("lxmf==0.4.4")
-                install("pyserial")
-            }
+
+        // Corrected NDK syntax for Kotlin DSL
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
-        ndk { abiFilters("armeabi-v7a", "arm64-v8a") }
     }
-    buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.8" }
+
+    // Move python block OUTSIDE of defaultConfig
+    python {
+        buildPython("python3")
+        pip {
+            install("rns==0.6.7")
+            install("lxmf==0.4.4")
+            install("pyserial")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
+
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
