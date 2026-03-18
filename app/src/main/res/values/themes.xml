@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MeshChat" parent="Theme.Material3.Light.NoActionBar">
-        <!-- We can add custom colors here later -->
+    <style name="Theme.MeshChat" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Main colors for the app window -->
+        <item name="colorPrimary">#2196F3</item>
     </style>
 </resources>
