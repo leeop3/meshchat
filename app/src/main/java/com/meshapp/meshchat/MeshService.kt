@@ -8,7 +8,9 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import java.io.ServerSocket
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
 import kotlin.concurrent.thread
@@ -39,6 +41,7 @@ class MeshService : Service() {
             .setContentTitle("MeshChat Active")
             .setContentText("Linking RNode to Reticulum...")
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+            .setOngoing(true)
             .build()
             
         startForeground(1, notification)
@@ -58,7 +61,6 @@ class MeshService : Service() {
             } catch (e: Exception) {
                 Log.e(TAG, "Standard connection failed, trying fallback...")
                 try {
-                    // Fallback: Using reflection to call the hidden createRfcommSocket method
                     val method = device.javaClass.getMethod("createRfcommSocket", Int::class.javaPrimitiveType)
                     btSocket = method.invoke(device, 1) as BluetoothSocket
                     btSocket?.connect()
@@ -72,24 +74,29 @@ class MeshService : Service() {
     }
 
     private fun startTcpBridge() {
-        if (tcpServer == null) {
-            tcpServer = ServerSocket(50001)
-        }
-        thread {
-            while (true) {
-                try {
-                    val client = tcpServer?.accept() ?: break
-                    Log.d(TAG, "Reticulum (Python) connected to Bridge")
-                    handleBridge(client)
-                } catch (e: Exception) { break }
+        try {
+            if (tcpServer == null) {
+                tcpServer = ServerSocket(50001)
             }
+            thread {
+                while (true) {
+                    try {
+                        val client = tcpServer?.accept() ?: break
+                        Log.d(TAG, "Reticulum (Python) connected to Bridge")
+                        handleBridge(client)
+                    } catch (e: Exception) { break }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not start TCP Server: ${e.message}")
         }
     }
 
     private fun handleBridge(tcpSocket: Socket) {
+        // BT -> TCP
         thread {
-            val btIn = btSocket?.inputStream
-            val tcpOut = tcpSocket.getOutputStream()
+            val btIn: InputStream? = btSocket?.inputStream
+            val tcpOut: OutputStream = tcpSocket.getOutputStream()
             val buffer = ByteArray(2048)
             try {
                 while (true) {
@@ -99,12 +106,16 @@ class MeshService : Service() {
                         tcpOut.flush()
                     }
                 }
-            } catch (e: Exception) { Log.e(TAG, "BT -> TCP Bridge Error") }
+            } catch (e: Exception) { 
+                Log.e(TAG, "BT -> TCP Bridge Closed")
+                tcpSocket.close() 
+            }
         }
         
+        // TCP -> BT
         thread {
-            val tcpIn = tcpSocket.getInputStream()
-            val btOut = btSocket?.outputStream
+            val tcpIn: InputStream = tcpSocket.getInputStream()
+            val btOut: OutputStream? = btSocket?.outputStream
             val buffer = ByteArray(2048)
             try {
                 while (true) {
@@ -114,13 +125,18 @@ class MeshService : Service() {
                         btOut?.flush()
                     }
                 }
-            } catch (e: Exception) { Log.e(TAG, "TCP -> BT Bridge Error") }
+            } catch (e: Exception) { 
+                Log.e(TAG, "TCP -> BT Bridge Closed")
+                tcpSocket.close() 
+            }
         }
     }
 
     override fun onDestroy() {
-        btSocket?.close()
-        tcpServer?.close()
+        try {
+            btSocket?.close()
+            tcpServer?.close()
+        } catch (e: Exception) {}
         super.onDestroy()
     }
 
